@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Reminder System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background: #007bff;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #task-list {
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Reminder System</h1>
+        <form id="task-form">
+            <input type="text" id="task-title" placeholder="Task Title" required>
+            <input type="number" id="task-time" placeholder="Due Time (minutes)" required>
+            <input type="number" id="task-priority" placeholder="Priority" required>
+            <button type="submit">Add Task</button>
+        </form>
+        <div id="task-list">
+            <h2>Tasks</h2>
+            <ul id="tasks"></ul>
+        </div>
+    </div>
+    <script>
+        const tasks = [];
+
+        function addTask(title, dueTime, priority) {
+            try {
+                if (!title || !dueTime || !priority) {
+                    throw new Error("All fields (title, dueTime, priority) are required.");
+                }
+                tasks.push({ title, dueTime, priority });
+                console.log(`Task added: ${title}`);
+                displayTasks();
+                scheduleReminder(title, dueTime);
+            } catch (error) {
+                console.error(`Error adding task: ${error.message}`);
+            }
+        }
+
+        function sortTasksByPriority() {
+            tasks.sort((a, b) => a.priority - b.priority);
+        }
+
+        function displayTasks() {
+            const taskList = document.getElementById("tasks");
+            taskList.innerHTML = "";
+            tasks.forEach(task => {
+                const li = document.createElement("li");
+                li.textContent = `${task.title} - Due in ${task.dueTime} minutes - Priority: ${task.priority}`;
+                taskList.appendChild(li);
+            });
+        }
+
+        function displayTasksDueWithin(minutes) {
+            const now = new Date();
+            const upcomingTasks = tasks.filter(task => {
+                const taskTime = new Date(now.getTime() + task.dueTime * 60000);
+                return taskTime - now <= minutes * 60000;
+            });
+
+            console.log(`Tasks due within ${minutes} minutes:`);
+            console.table(upcomingTasks);
+        }
+
+        function scheduleReminder(title, dueTime) {
+            setTimeout(() => {
+                alert(`Reminder: Task '${title}' is due now!`);
+            }, dueTime * 60000);
+        }
+
+        document.getElementById("task-form").addEventListener("submit", event => {
+            event.preventDefault();
+            const title = document.getElementById("task-title").value;
+            const dueTime = parseInt(document.getElementById("task-time").value);
+            const priority = parseInt(document.getElementById("task-priority").value);
+            addTask(title, dueTime, priority);
+        });
+    </script>
+</body>
+</html>
